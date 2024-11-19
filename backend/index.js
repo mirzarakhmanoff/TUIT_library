@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 const app = express();
 
 // Middleware
-app.use(cors({ origin: "http://localhost:3003" }));
+app.use(cors({ origin: "http://localhost:3002" }));
 app.use(express.json());
 
 // Эндпоинт для получения всех авторов
