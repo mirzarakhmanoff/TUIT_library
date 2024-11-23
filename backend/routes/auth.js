@@ -28,6 +28,9 @@ const router = express.Router();
  *         password:
  *           type: string
  *           description: The student's password
+ *         role:
+ *           type: string
+ *           description: The student's role (e.g., "student", "admin")
  */
 
 /**
@@ -52,7 +55,7 @@ const router = express.Router();
  */
 router.post("/register", async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
 
     const existingUser = await prisma.student.findUnique({ where: { email } });
     if (existingUser) {
@@ -66,12 +69,21 @@ router.post("/register", async (req, res) => {
         name,
         email,
         password: hashedPassword,
+        role: role || "student", // default to "student" if no role provided
       },
     });
 
+    const token = jwt.sign(
+      { studentId: newStudent.id, role: newStudent.role },
+      JWT_SECRET,
+      {
+        expiresIn: "1h",
+      }
+    );
+
     res.status(201).json({
       message: "Пользователь успешно зарегистрирован",
-      student: newStudent,
+      student: { ...newStudent, token },
     });
   } catch (error) {
     console.error(error);
@@ -112,6 +124,9 @@ router.post("/register", async (req, res) => {
  *                 token:
  *                   type: string
  *                   description: JWT token
+ *                 role:
+ *                   type: string
+ *                   description: The student's role
  *       401:
  *         description: Invalid email or password
  *       500:
@@ -131,11 +146,19 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ error: "Неправильный email или пароль" });
     }
 
-    const token = jwt.sign({ studentId: student.id }, JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign(
+      { studentId: student.id, role: student.role },
+      JWT_SECRET,
+      {
+        expiresIn: "1h",
+      }
+    );
 
-    res.json({ message: "Успешный вход", token });
+    res.json({
+      message: "Успешный вход",
+      token,
+      role: student.role, // Include role in the response
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Ошибка сервера" });
