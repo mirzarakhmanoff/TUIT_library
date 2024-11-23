@@ -1,18 +1,18 @@
+// index.js
 import express from "express";
-import { PrismaClient } from "@prisma/client";
-import cors from "cors";
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
-
+import cors from "cors";
 import booksRouter from "./routes/books.js";
 import authorRouter from "./routes/author.js";
 import borrowsRouter from "./routes/borrows.js";
 import categoriesRouter from "./routes/categories.js";
 import studentsRouter from "./routes/students.js";
+import authRouter from "./routes/auth.js"; // Добавляем роутер авторизации
 
-const prisma = new PrismaClient();
 const app = express();
 
+// Middleware
 app.use(cors());
 app.use(express.json());
 app.use("/books", booksRouter);
@@ -20,6 +20,7 @@ app.use("/author", authorRouter);
 app.use("/borrows", borrowsRouter);
 app.use("/categories", categoriesRouter);
 app.use("/students", studentsRouter);
+app.use("/auth", authRouter);
 
 // Swagger настройки
 const options = {
@@ -36,7 +37,7 @@ const options = {
       },
     ],
   },
-  apis: ["./routes.js"], // Путь к файлу с документацией (в данном случае тот же файл)
+  apis: ["./routes/auth.js", "./routes/books.js", "./routes/author.js"], // Путь к файлам с документацией
 };
 
 const swaggerSpec = swaggerJsdoc(options);

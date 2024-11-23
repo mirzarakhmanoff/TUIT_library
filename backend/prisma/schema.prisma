@@ -26,17 +26,20 @@ model Book {
   category    Category @relation(fields: [categoryId], references: [id])
   reviews     Review[]
   borrows     Borrow[]
-  rating      Float?   // Add this line for rating (optional, but makes sense for your use case)
-  image       String?  // Add this line for image (optional)
+  rating      Float?   
+  image       String?  
 }
 
 model Student {
-  id    Int    @id @default(autoincrement())
-  name  String
-  email String @unique
-  borrows Borrow[]
-  reviews Review[]
+  id       Int       @id @default(autoincrement())
+  name     String
+  email    String    @unique
+  password String    
+  role     String    @default("student") 
+  borrows  Borrow[]
+  reviews  Review[]
 }
+
 
 model Category {
   id    Int    @id @default(autoincrement())
