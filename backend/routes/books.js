@@ -43,9 +43,15 @@ const router = express.Router();
 // Эндпоинт для получения всех книг
 router.get("/", async (req, res) => {
   try {
-    const books = await prisma.book.findMany();
+    const books = await prisma.book.findMany({
+      include: {
+        author: true, // Включить данные автора
+      },
+    });
+
     res.json(books);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Failed to fetch books" });
   }
 });

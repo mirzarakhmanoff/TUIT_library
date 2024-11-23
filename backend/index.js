@@ -13,7 +13,6 @@ import studentsRouter from "./routes/students.js";
 const prisma = new PrismaClient();
 const app = express();
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 app.use("/books", booksRouter);
@@ -37,7 +36,7 @@ const options = {
       },
     ],
   },
-  apis: ["./routes/*.js"], // Путь к файлу с документацией (в данном случае тот же файл)
+  apis: ["./routes.js"], // Путь к файлу с документацией (в данном случае тот же файл)
 };
 
 const swaggerSpec = swaggerJsdoc(options);
