@@ -98,13 +98,18 @@ router.get("/:id", async (req, res) => {
   try {
     const book = await prisma.book.findUnique({
       where: { id: Number(id) },
+      include: {
+        author: true,
+      },
     });
+
     if (book) {
       res.json(book);
     } else {
       res.status(404).json({ error: "Book not found" });
     }
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Failed to fetch book" });
   }
 });
