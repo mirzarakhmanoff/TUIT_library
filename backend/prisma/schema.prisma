@@ -46,13 +46,14 @@ model Category {
 }
 
 model Borrow {
-  id         Int       @id @default(autoincrement())
-  studentId  Int
-  bookId     Int
-  borrowedAt DateTime
-  returnedAt DateTime?
-  book       Book      @relation(fields: [bookId], references: [id])
-  student    Student   @relation(fields: [studentId], references: [id])
+  id           Int       @id @default(autoincrement())
+  studentId    Int
+  bookId       Int
+  borrowedAt   DateTime
+  returnedAt   DateTime?
+  durationDays Int
+  book         Book      @relation(fields: [bookId], references: [id])
+  student      Student   @relation(fields: [studentId], references: [id])
 }
 
 model Review {

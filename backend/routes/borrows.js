@@ -151,17 +151,35 @@ router.get("/:id", async (req, res) => {
  */
 router.post("/", async (req, res) => {
   const { studentId, bookId, borrowedAt } = req.body;
+
   try {
+    const borrowedDate = new Date(borrowedAt);
+    const today = new Date();
+    const daysBorrowed = Math.ceil(
+      (today - borrowedDate) / (1000 * 60 * 60 * 24)
+    );
+
+    // Создаем запись о заимствовании с добавленным полем durationDays
     const borrow = await prisma.borrow.create({
       data: {
         studentId,
         bookId,
         borrowedAt,
-        returnedAt: null, // Возврат книги пока не произошел
+        returnedAt: null,
+        durationDays: daysBorrowed, // Добавляем вычисленное поле durationDays
+      },
+      include: {
+        student: true,
       },
     });
-    res.status(201).json(borrow);
+
+    res.status(201).json({
+      borrow,
+      student: borrow.student,
+      daysBorrowed,
+    });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Failed to create borrow record" });
   }
 });

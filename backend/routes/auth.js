@@ -154,10 +154,12 @@ router.post("/login", async (req, res) => {
       }
     );
 
+    const { password: _, ...studentData } = student;
+
     res.json({
       message: "Успешный вход",
       token,
-      role: student.role, // Include role in the response
+      student: studentData,
     });
   } catch (error) {
     console.error(error);
