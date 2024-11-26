@@ -42,8 +42,18 @@ const router = express.Router();
 
 // Эндпоинт для получения всех книг
 router.get("/", async (req, res) => {
+  const { search } = req.query; // Получаем параметр поиска
+
   try {
     const books = await prisma.book.findMany({
+      where: search
+        ? {
+            OR: [
+              { title: { contains: search, mode: "insensitive" } }, // Поиск по названию книги
+              { author: { name: { contains: search, mode: "insensitive" } } }, // Поиск по имени автора
+            ],
+          }
+        : {}, // Если параметра нет, возвращаем все книги
       include: {
         author: true, // Включить данные автора
       },
@@ -51,7 +61,7 @@ router.get("/", async (req, res) => {
 
     res.json(books);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ error: "Failed to fetch books" });
   }
 });
