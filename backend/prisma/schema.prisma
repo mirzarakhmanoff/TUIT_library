@@ -23,6 +23,7 @@ model Book {
   image       String?
   rating      Float?
   description String?
+  liked       Boolean? @default(false)
   author      Author   @relation(fields: [authorId], references: [id])
   category    Category @relation(fields: [categoryId], references: [id])
   borrows     Borrow[]

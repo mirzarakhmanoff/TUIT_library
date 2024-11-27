@@ -182,4 +182,47 @@ router.post("/", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /books/{id}/toggle-like:
+ *   post:
+ *     tags:
+ *       - Books
+ *     summary: Toggle like status of a book
+ *     description: Add or remove a book from the wishlist
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The book's ID
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Successfully toggled like status
+ *       404:
+ *         description: Book not found
+ */
+
+router.post("/:id/toggle-like", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const book = await prisma.book.findUnique({ where: { id: Number(id) } });
+    if (!book) {
+      return res.status(404).json({ error: "Book not found" });
+    }
+
+    // Переключаем статус лайка
+    const updatedBook = await prisma.book.update({
+      where: { id: Number(id) },
+      data: { liked: !book.liked },
+    });
+
+    res.json(updatedBook);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to toggle like status" });
+  }
+});
+
 export default router;
