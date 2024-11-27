@@ -37,7 +37,14 @@ const options = {
       },
     ],
   },
-  apis: ["./routes/auth.js", "./routes/books.js", "./routes/author.js"], // Путь к файлам с документацией
+  apis: [
+    "./routes/auth.js",
+    "./routes/books.js",
+    "./routes/author.js",
+    "./routes/borrows.js",
+    "./routes/categories/js",
+    "./routes/students.js",
+  ], // Путь к файлам с документацией
 };
 
 const swaggerSpec = swaggerJsdoc(options);

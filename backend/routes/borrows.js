@@ -88,18 +88,24 @@ router.get("/", async (req, res) => {
  *         description: Borrow record not found
  */
 router.get("/:id", async (req, res) => {
-  const { id } = req.params;
+  const { id } = req.params; // ID студента
   try {
-    const borrow = await prisma.borrow.findUnique({
-      where: { id: Number(id) },
+    const borrows = await prisma.borrow.findMany({
+      where: { studentId: Number(id) }, // Фильтрация по studentId
+      include: {
+        book: true, // Включаем связанные данные о книге
+      },
     });
-    if (borrow) {
-      res.json(borrow);
+
+    if (borrows.length > 0) {
+      res.json(borrows);
     } else {
-      res.status(404).json({ error: "Borrow record not found" });
+      res
+        .status(404)
+        .json({ error: "No borrow records found for this student" });
     }
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch borrow record" });
+    res.status(500).json({ error: "Failed to fetch borrow records" });
   }
 });
 
