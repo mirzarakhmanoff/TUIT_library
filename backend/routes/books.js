@@ -110,6 +110,7 @@ router.get("/:id", async (req, res) => {
       where: { id: Number(id) },
       include: {
         author: true,
+        borrows: true,
       },
     });
 
