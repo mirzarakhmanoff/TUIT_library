@@ -142,11 +142,20 @@ router.get("/:id", async (req, res) => {
  *             properties:
  *               title:
  *                 type: string
- *               authorId:
- *                 type: integer
+ *               author:
+ *                 type: object   // изменено на object (объект автора)
+ *                 properties:
+ *                   name:
+ *                     type: string
+ *                   bio:
+ *                     type: string
+ *               image:
+ *                 type: string   // добавлено поле image (ссылка на изображение)
  *               publishedAt:
  *                 type: string
  *                 format: date
+ *               description:
+ *                 type: string   // добавлено поле description (описание)
  *     responses:
  *       201:
  *         description: Successfully created a book
@@ -159,27 +168,63 @@ router.get("/:id", async (req, res) => {
  *                   type: integer
  *                 title:
  *                   type: string
- *                 authorId:
- *                   type: integer
+ *                 author:
+ *                   type: object   // автор теперь объект
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                     bio:
+ *                       type: string
+ *                 image:
+ *                   type: string   // добавлено поле image
  *                 publishedAt:
  *                   type: string
  *                   format: date
+ *                 description:
+ *                   type: string   // добавлено описание книги
  */
 
 // Эндпоинт для создания новой книги
 router.post("/", async (req, res) => {
-  const { title, authorId, publishedAt } = req.body;
+  const { title, author, categoryId, image, publishedAt, description } =
+    req.body;
+
   try {
+    // Найдем существующего автора по имени
+    let authorRecord = await prisma.author.findFirst({
+      where: {
+        name: author.name,
+      },
+    });
+
+    // Если автор не существует, создадим нового
+    if (!authorRecord) {
+      authorRecord = await prisma.author.create({
+        data: {
+          name: author.name,
+          bio: author.bio,
+        },
+      });
+    }
+
+    // Создаем книгу и связываем с найденным или созданным автором
     const book = await prisma.book.create({
       data: {
         title,
-        authorId,
-        publishedAt,
+        authorId: authorRecord.id,
+        categoryId,
+        image,
+        publishedAt: new Date(publishedAt), // Преобразуем строку в Date
+        description,
       },
     });
+
     res.status(201).json(book);
   } catch (error) {
-    res.status(500).json({ error: "Failed to create book" });
+    console.error("Error creating book:", error);
+    res
+      .status(500)
+      .json({ error: "Failed to create book", details: error.message });
   }
 });
 
