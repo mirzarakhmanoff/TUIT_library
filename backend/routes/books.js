@@ -124,7 +124,6 @@ router.get("/:id", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch book" });
   }
 });
-
 /**
  * @swagger
  * /books:
@@ -143,19 +142,19 @@ router.get("/:id", async (req, res) => {
  *               title:
  *                 type: string
  *               author:
- *                 type: object   // изменено на object (объект автора)
+ *                 type: object   // объект автора
  *                 properties:
  *                   name:
  *                     type: string
  *                   bio:
  *                     type: string
  *               image:
- *                 type: string   // добавлено поле image (ссылка на изображение)
+ *                 type: string   // ссылка на изображение
  *               publishedAt:
  *                 type: string
  *                 format: date
  *               description:
- *                 type: string   // добавлено поле description (описание)
+ *                 type: string   // описание книги
  *     responses:
  *       201:
  *         description: Successfully created a book
@@ -190,14 +189,14 @@ router.post("/", async (req, res) => {
     req.body;
 
   try {
-    // Найдем существующего автора по имени
+    // Ищем автора в базе данных
     let authorRecord = await prisma.author.findFirst({
       where: {
-        name: author.name,
+        name: author.name, // Ищем по имени автора
       },
     });
 
-    // Если автор не существует, создадим нового
+    // Если автор не найден, создаём нового автора
     if (!authorRecord) {
       authorRecord = await prisma.author.create({
         data: {
@@ -207,18 +206,31 @@ router.post("/", async (req, res) => {
       });
     }
 
-    // Создаем книгу и связываем с найденным или созданным автором
+    // Ищем категорию книги, если она передана
+    let categoryRecord = null;
+    if (categoryId) {
+      categoryRecord = await prisma.category.findUnique({
+        where: { id: categoryId },
+      });
+    }
+
+    // Создаём книгу и связываем её с найденными или созданными автором и категорией
     const book = await prisma.book.create({
       data: {
         title,
-        authorId: authorRecord.id,
-        categoryId,
-        image,
+        author: {
+          connect: { id: authorRecord.id }, // Связываем с автором по ID
+        },
+        category: categoryRecord
+          ? { connect: { id: categoryRecord.id } }
+          : undefined, // Если категория найдена, связываем её с книгой
+        image, // Убедитесь, что передаёте правильный URL изображения
         publishedAt: new Date(publishedAt), // Преобразуем строку в Date
-        description,
+        description, // Описание книги
       },
     });
 
+    // Отправляем успешный ответ
     res.status(201).json(book);
   } catch (error) {
     console.error("Error creating book:", error);

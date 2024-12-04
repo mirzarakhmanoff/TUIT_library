@@ -42,14 +42,13 @@ const options = {
     "./routes/books.js",
     "./routes/author.js",
     "./routes/borrows.js",
-    "./routes/categories/js",
+    "./routes/categories.js",
     "./routes/students.js",
   ], // Путь к файлам с документацией
 };
 
 const swaggerSpec = swaggerJsdoc(options);
 
-// Подключение Swagger UI
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 const PORT = 5001;
