@@ -1,4 +1,3 @@
-// index.js
 import express from "express";
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
@@ -8,11 +7,10 @@ import authorRouter from "./routes/author.js";
 import borrowsRouter from "./routes/borrows.js";
 import categoriesRouter from "./routes/categories.js";
 import studentsRouter from "./routes/students.js";
-import authRouter from "./routes/auth.js"; // Добавляем роутер авторизации
+import authRouter from "./routes/auth.js";
 
 const app = express();
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 app.use("/books", booksRouter);
@@ -22,7 +20,6 @@ app.use("/categories", categoriesRouter);
 app.use("/students", studentsRouter);
 app.use("/auth", authRouter);
 
-// Swagger настройки
 const options = {
   swaggerDefinition: {
     openapi: "3.0.0",
@@ -44,7 +41,7 @@ const options = {
     "./routes/borrows.js",
     "./routes/categories.js",
     "./routes/students.js",
-  ], // Путь к файлам с документацией
+  ],
 };
 
 const swaggerSpec = swaggerJsdoc(options);
